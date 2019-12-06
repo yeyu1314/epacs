@@ -30,22 +30,13 @@
         <el-table-column prop="note" align="center" label="故障描述"></el-table-column>
         <el-table-column prop="carCylinder" align="center" label="发动机缸数量"></el-table-column>
         <el-table-column prop="avgValue" fixed="right" label="报告解读" align="center" width="280">
-          <!--<template slot-scope="scope">
-            <div v-if="isShowPdf == 3">
-              <el-button type="success" size="small">报告解读</el-button>
-              <el-button type="success" size="small">车主答疑</el-button>
-            </div>
-            <div v-if="isShowPdf == 2">
-              <el-button type="success" size="small">报告解读</el-button>
-            </div>
-          </template>-->
           <template slot-scope="scope">
             <div v-if="scope.row.avgValue == 3">
-              <el-button type="success" size="small" @click="viewPdf30">报告解读</el-button>
-              <el-button type="success" size="small">车主答疑</el-button>
+              <el-button type="success" size="small" @click="isViewPdf30 = true" >报告解读</el-button>
+              <el-button type="success" size="small" @click="isViewPdf31 = true" >车主答疑</el-button>
             </div>
             <div v-if="scope.row.avgValue == 2">
-              <el-button type="success" size="small" @click="viewPdf30">报告解读</el-button>
+              <el-button type="success" size="small" @click="isViewPdf20 = true" >报告解读</el-button>
             </div>
             <div v-if="scope.row.avgValue == 0"></div>
           </template>
@@ -72,6 +63,30 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-dialog
+        title="预览文件"
+        :visible.sync="isViewPdf20"
+        :before-close="handleClose"
+        :fullscreen="true"
+      >
+        <iframe :src=url20 frameborder="0" style="width: 100vw; height: 80vh"></iframe>
+      </el-dialog>
+      <el-dialog
+        title="预览文件"
+        :visible.sync="isViewPdf30"
+        :before-close="handleClose"
+        :fullscreen="true"
+      >
+        <iframe :src=url30 frameborder="0" style="width: 100%; height: 80vh"></iframe>
+      </el-dialog>
+      <el-dialog
+        title="预览文件"
+        :visible.sync="isViewPdf31"
+        :before-close="handleClose"
+        :fullscreen="true"
+      >
+        <iframe :src=url31 frameborder="0" style="width: 100%; height: 80vh"></iframe>
+      </el-dialog>
     </div>
     <div class="pagination">
       <el-pagination
@@ -116,10 +131,7 @@
 
 <script>
 import net from "../../assets/js/public";
-import PDF from './pdf';
-import Vue from 'vue'
 export default {
-  components: {PDF},
   data() {
     return {
       orderPageShowOrgName:false,
@@ -135,7 +147,13 @@ export default {
       //查询
       carPai: null,
       page: this.$route.params,
-      isShowPdf : 3
+      isShowPdf : 3,
+      isViewPdf20: false,
+      isViewPdf30: false,
+      isViewPdf31: false,
+      url30 : 'http://autoepacs.com/30.pdf',
+      url31 : 'http://autoepacs.com/31.pdf',
+      url20 : 'http://autoepacs.com/20.pdf',
     };
   },
   created() {
@@ -189,7 +207,7 @@ export default {
           });
       });
     },
-    getlistData(param, data) {
+    getlistData(param, data)  {
       net
         .request("admin/order/queryListPage", "post", param, data)
         .then(res => {
@@ -291,11 +309,12 @@ export default {
         value.push(0);
       }
     },
-    viewPdf30 (){
-      // const pdf = 'http://120.24.178.4/30.pdf';
-      // window.open(pdf, 'PDF');
-      // window.location.href = pdf
-      window.location.href = 'http://120.24.178.4/30.pdf'
+    handleClose(done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done();
+        })
+        .catch(_ => {});
     }
   }
 };

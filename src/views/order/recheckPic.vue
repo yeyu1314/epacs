@@ -122,7 +122,7 @@
           </p>
           <p>
             <span>燃油类型：{{fuelTypeName}}</span>
-            <span>综合油耗：{{oilDeplete}}L/100Km</span>
+            <span>综合油耗：{{oilDeplete}}L/100km</span>
             <span>行驶里程：{{mile}}KM</span>
             <span id="mainBtn">
               <el-button type="primary" @click="uploadImgs">确认提交</el-button>

@@ -96,7 +96,7 @@
         <el-button type="primary" @click="keepData">编辑并通过</el-button>
         <el-button type="warning" @click="submitReport">审核通过</el-button>
         <el-button type="danger" @click="repulse">打回</el-button>
-        <el-button type="primary" @click="seeCarFrameNumber">查看车架号图片</el-button>
+        <!-- <el-button type="primary" @click="seeCarFrameNumber">查看车架号图片</el-button> -->
         <el-button type="danger" @click="back">返回列表</el-button>
         <el-button type="success" @click="printdiv">预览/打印</el-button>
         <el-button type="primary" @click="editMileage">编辑里程</el-button>
@@ -183,7 +183,7 @@
                     <span
                       v-if="oilDeplete!=0"
                       style="display: inline-block;height: 25px;padding: 0 5px;border-bottom: 1px solid"
-                    >{{oilDeplete}}L/100Km</span>
+                    >{{oilDeplete}}L/100km</span>
 
                     <span
                       v-if="oilDeplete==0"
@@ -531,7 +531,7 @@ export default {
           if (res.retcode == 1) {
             net.message(this, "修改成功", "success");
             this.dialogVisible4 = false;
-            this.mileNumber = this.editMileNumber + "Km";
+            this.mileNumber = this.editMileNumber + "km";
           } else {
             net.message(this, res.retmsg, "error");
           }
@@ -712,7 +712,7 @@ export default {
       this.dialogVisible = false;
       this.jobId = row.jobId;
       this.jobCode = row.jobCode;
-      this.mileNumber = row.mile + "Km";
+      this.mileNumber = row.mile + "km";
       this.checkProList = [];
       this.dataModel = [];
       this.version = row.version;

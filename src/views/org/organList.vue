@@ -29,7 +29,7 @@
           <el-table-column prop="orgHeaderName" label="负责人" align="center"></el-table-column>
           <el-table-column prop="orgHeaderPhone" label="电话" align="center"></el-table-column>
           <el-table-column prop="statement" label="账单日" align="center"></el-table-column>
-          <el-table-column prop="chargeTime" label="下单时间" align="center" :formatter="formartTime"></el-table-column>
+          <el-table-column prop="chargeTime" label="正式收费时间" align="center" :formatter="formartTime"></el-table-column>
           <el-table-column fixed="right" label="操作" align="center">
             <template slot-scope="scope">
               <el-button
@@ -153,7 +153,7 @@
         v-model="downOrderDate"
         type="date"
         value-format="timestamp"
-        placeholder="请选择下单日期">
+        placeholder="请选择正式收费日期">
       </el-date-picker>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -165,7 +165,7 @@
 
 <script>
 import net from "../../assets/js/public";
-import $_ from "jquery";
+// import $_ from "jquery";
 export default {
   data() {
     return {
@@ -266,7 +266,7 @@ export default {
       this.edit_statement = "";
       this.tableTitle = "新增维修站";
       this.isDisable = false;
-      this.downOrderDate = '';// 下单时间
+      this.downOrderDate = '';// 正式收费时间
     },
     editClick(row) {
       console.log(row)
@@ -293,7 +293,7 @@ export default {
       this.sign = 1;
       this.tableTitle = "修改维修站";
       this.isDisable = true;
-      this.downOrderDate = row.chargeTime;// 下单时间
+      this.downOrderDate = row.chargeTime;
     },
     //监听下拉
     areaChange(value) {

@@ -54,40 +54,63 @@
             ></el-option>
           </el-select>
         </div>
+        <div class="p_select">
+          <el-select clearable v-model="filterNewOrg" filterable placeholder="请选择过滤试运营">
+            <el-option
+              v-for="item in filterNewOrgList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </div>
       </div>
+
       <div class="table">
         <el-tabs type="border-card" v-model="tabIndex">
           <el-tab-pane label="按天统计">
-            <div class="search">
-              <div class="p_select">
-                <el-date-picker
-                  v-model="queryDay"
-                  type="date"
-                  placeholder="选择日期"
-                  value-format="yyyy-MM-dd"
-                  :picker-options="pickerOptions"
-                >></el-date-picker>
+
+            <div id="capture" ref="imageTofile">
+              <div class="search">
+                <div class="p_select">
+                  <el-date-picker
+                    v-model="queryDay"
+                    type="date"
+                    placeholder="选择日期"
+                    value-format="yyyy-MM-dd"
+                    :picker-options="pickerOptions"
+                  >></el-date-picker>
+                </div>
+                <div class="p_select">
+                  <el-button type="primary" @click="clickDaySearch" icon="el-icon-search">查询</el-button>
+                  <el-button type="primary" @click="toImage" icon="el-icon-download" v-show="dataLength > 1" >下载图片</el-button>
+                </div>
               </div>
-              <div class="p_select">
-                <el-button type="primary" @click="clickDaySearch" icon="el-icon-search">查询</el-button>
-              </div>
+              <!--<img :src="htmlUrl">-->
+                <el-table
+                  id = "mainFrame"
+                  :data="dayDataList"
+                  border
+                  style="width: 100%"
+                  :header-cell-style="tableHeaderColor"
+                  :cell-style="cellStyle"
+                >
+                  <el-table-column prop="orgName" label="店面名称" align="center" width="240px"></el-table-column>
+                  <el-table-column label="检测台次" align="center" width="140px">
+                    <template slot-scope="scope">
+                      <span>{{scope.row.t101 + scope.row.t102 + scope.row.t199}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="step2Count" label="治疗台次" align="center" width="140px"></el-table-column>
+                  <el-table-column prop="t101" label="I类检测" align="center"></el-table-column>
+                  <el-table-column prop="t102" label="Ⅱ类检测" align="center"></el-table-column>
+                  <el-table-column prop="t199" label="检测(其他)" align="center"></el-table-column>
+                  <el-table-column prop="t200" label="动力康复(缸数)" align="center"></el-table-column>
+                  <el-table-column prop="t202" label="缸内修复(缸数)" align="center"></el-table-column>
+                  <el-table-column prop="t202" label="烧机油治理(缸数)" align="center"></el-table-column>
+                  <el-table-column prop="subMoney" label="营收合计" align="center"></el-table-column>
+                </el-table>
             </div>
-            <el-table :data="dayDataList" border style="width: 100%">
-              <el-table-column prop="orgName" label="店面名称" align="center"></el-table-column>
-              <el-table-column  label="检测台次" align="center">
-                <template slot-scope="scope">
-                  <span>{{scope.row.t101 + scope.row.t102 + scope.row.t199}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column prop="t101" label="I类检测" align="center"></el-table-column>
-              <el-table-column prop="t102" label="Ⅱ类检测" align="center"></el-table-column>
-              <el-table-column prop="t199" label="检测(其他)" align="center"></el-table-column>
-              <el-table-column prop="step2Count" label="治疗台次" align="center"></el-table-column>
-              <el-table-column prop="t200" label="动力康复(缸数)" align="center"></el-table-column>
-              <el-table-column prop="t202" label="缸内修复(缸数)" align="center"></el-table-column>
-              <el-table-column prop="t202" label="烧机油治理(缸数)" align="center"></el-table-column>
-              <el-table-column prop="subMoney" label="营收合计" align="center"></el-table-column>
-            </el-table>
           </el-tab-pane>
           <el-tab-pane label="按月统计">
             <div class="search">
@@ -104,17 +127,23 @@
                 <el-button type="primary" @click="clickMonthSearch" icon="el-icon-search">查询</el-button>
               </div>
             </div>
-            <el-table :data="monthDataList" border style="width: 100%">
+            <el-table
+              :data="monthDataList"
+              border
+              style="width: 100%"
+              :header-cell-style="tableHeaderColor"
+              :cell-style="cellStyle"
+            >
               <el-table-column prop="orgName" label="店面名称" align="center"></el-table-column>
-              <el-table-column  label="检测台次" align="center">
+              <el-table-column label="检测台次" align="center">
                 <template slot-scope="scope">
                   <span>{{scope.row.t101 + scope.row.t102 + scope.row.t199}}</span>
                 </template>
               </el-table-column>
+              <el-table-column prop="step2Count" label="治疗台次" align="center"></el-table-column>
               <el-table-column prop="t101" label="I类检测" align="center"></el-table-column>
               <el-table-column prop="t102" label="Ⅱ类检测" align="center"></el-table-column>
               <el-table-column prop="t199" label="检测(其他)" align="center"></el-table-column>
-              <el-table-column prop="step2Count" label="治疗台次" align="center"></el-table-column>
               <el-table-column prop="t200" label="动力康复(缸数)" align="center"></el-table-column>
               <el-table-column prop="t202" label="缸内修复(缸数)" align="center"></el-table-column>
               <el-table-column prop="t202" label="烧机油治理(缸数)" align="center"></el-table-column>
@@ -146,17 +175,23 @@
                 <el-button type="primary" @click="clickTimeSearch" icon="el-icon-search">查询</el-button>
               </div>
             </div>
-            <el-table :data="timeDataList" border style="width: 100%">
+            <el-table
+              :data="timeDataList"
+              border
+              style="width: 100%"
+              :header-cell-style="tableHeaderColor"
+              :cell-style="cellStyle"
+            >
               <el-table-column prop="orgName" label="店面名称" align="center"></el-table-column>
-              <el-table-column  label="检测台次" align="center">
+              <el-table-column label="检测台次" align="center">
                 <template slot-scope="scope">
                   <span>{{scope.row.t101 + scope.row.t102 + scope.row.t199}}</span>
                 </template>
               </el-table-column>
+              <el-table-column prop="step2Count" label="治疗台次" align="center"></el-table-column>
               <el-table-column prop="t101" label="I类检测" align="center"></el-table-column>
               <el-table-column prop="t102" label="Ⅱ类检测" align="center"></el-table-column>
               <el-table-column prop="t199" label="检测(其他)" align="center"></el-table-column>
-              <el-table-column prop="step2Count" label="治疗台次" align="center"></el-table-column>
               <el-table-column prop="t200" label="动力康复(缸数)" align="center"></el-table-column>
               <el-table-column prop="t202" label="缸内修复(缸数)" align="center"></el-table-column>
               <el-table-column prop="t202" label="烧机油治理(缸数)" align="center"></el-table-column>
@@ -171,15 +206,22 @@
 
 <script>
 import net from "../../assets/js/public";
+import html2canvas from 'html2canvas'
 export default {
   data() {
     return {
+      htmlUrl: '',
       queryDay: "",
       queryMonth: "",
-      filterFree: 0,
+      filterFree: 1,
+      filterNewOrg: 1,
       filterFreeList: [
         { id: 0, name: "检测项-不过滤已转化" },
         { id: 1, name: "检测项-过滤已转化" }
+      ],
+      filterNewOrgList: [
+        { id: 0, name: "试运营-不过滤" },
+        { id: 1, name: "试运营-过滤" }
       ],
       areaId: "",
       areaData: [],
@@ -200,14 +242,28 @@ export default {
         disabledDate(time) {
           return time.getTime() > Date.now();
         }
-      }
+      },
+      dataLength : 0,
     };
+  },
+  components: {
+    html2canvas
   },
   created() {
     this.groupNm();
     // this.getareaData();
   },
   methods: {
+    tableHeaderColor({ row, column, rowIndex, columnIndex }) {
+      if (rowIndex === 0) {
+        return "color: #409EFF;font-weight: bold ;";
+      }
+    },
+    cellStyle({ row, column, rowIndex, columnIndex }){
+      if (row.orgName === "合计") {
+        return "color: black;font-weight: bold ;";
+      }
+    },
     //获取区
     getareaData() {
       net.request("admin/select/getArea", "post").then(res => {
@@ -293,6 +349,7 @@ export default {
             areaId: this.areaId,
             orgId: this.orgId,
             filterFree: this.filterFree,
+            filterNewOrg: this.filterNewOrg,
             StartTime: this.StartTime,
             EndTime: this.EndTime
           },
@@ -318,6 +375,7 @@ export default {
             areaId: this.areaId,
             orgId: this.orgId,
             filterFree: this.filterFree,
+            filterNewOrg: this.filterNewOrg,
             queryDay: this.queryDay
           },
           null
@@ -326,6 +384,10 @@ export default {
           if (res.retcode == 1) {
             net.message(this, "查询成功", "success");
             this.dayDataList = res.data;
+            this.dataLength  = res.data.length;
+
+            console.log(res.data)
+            console.log(res.data.length)
           } else {
             net.message(this, res.retmsg, "warning");
           }
@@ -342,6 +404,7 @@ export default {
             areaId: this.areaId,
             orgId: this.orgId,
             filterFree: this.filterFree,
+            filterNewOrg: this.filterNewOrg,
             queryMonth: this.queryMonth
           },
           null
@@ -360,54 +423,10 @@ export default {
         net.baseUrl + "admin/newReportExcel/exportFinancialDetailForOrg?";
       url += "jobOrgId=" + this.orgId;
       url += "&filterFree=" + this.filterFree;
+      url += "&filterNewOrg=" + this.filterNewOrg;
       url += "&StartTime=" + this.StartTime;
       url += "&EndTime=" + this.EndTime;
       window.open(url);
-    },
-    getCountInfo() {
-      net
-        .request(
-          "admin/financial/queryFinancialCountInfo",
-          "post",
-          {
-            jobOrgId: this.orgId,
-            filterFree: this.filterFree,
-            StartTime: this.StartTime,
-            EndTime: this.EndTime
-          },
-          null
-        )
-        .then(res => {
-          if (res.retcode == 1) {
-            this.tabAdataList = res.data.rows;
-          } else {
-            net.message(this, res.retmsg, "warning");
-          }
-        });
-    },
-    getDetailList() {
-      net
-        .request(
-          "admin/financial/queryFinancialDetailForOrg",
-          "post",
-          {
-            pageNo: this.pageNo,
-            pageSize: this.pageSize,
-            jobOrgId: this.orgId,
-            filterFree: this.filterFree,
-            StartTime: this.StartTime,
-            EndTime: this.EndTime
-          },
-          null
-        )
-        .then(res => {
-          if (res.retcode == 1) {
-            this.tabBdataList = res.data.rows;
-            this.total = res.data.total;
-          } else {
-            net.message(this, res.retmsg, "warning");
-          }
-        });
     },
     handleSizeChange(val) {
       this.pageSize = val;
@@ -464,7 +483,66 @@ export default {
           };
         }
       }
-    }
+    },
+
+    // 页面元素转图片
+    async toImage() {
+      // const width = "200px";
+      // // 第一个参数是需要生成截图的元素,第二个是自己需要配置的参数,宽高等
+      // html2canvas(this.$refs.imageTofile, {
+      //   backgroundColor: null,
+      //   // width : width
+      //   // windowWidth : width
+      // }).then((canvas) => {
+      //   // canvas.width = 500;
+      //   // canvas.style.width = "500px";
+      //   let url = canvas.toDataURL('image/png');
+      //   console.log(canvas,'图片地址')
+      //   console.log(url,'图片地址')
+      //   // this.htmlUrl = url;
+      //   // 把生成的base64位图片上传到服务器,生成在线图片地址
+      //   // this.sendUrl();
+      // })
+      await html2canvas(document.querySelector("#capture")).then(canvas => {
+        const imgUrl = canvas.toDataURL("png"); // 获取生成的图片的url
+        console.log(imgUrl)
+
+        var saveFile = function(data, filename){
+          var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+          save_link.href = data;
+          save_link.download = filename;
+
+          var event = document.createEvent('MouseEvents');
+          event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+          save_link.dispatchEvent(event);
+        }
+
+
+        const img = new Image();
+        img.src = canvas.toDataURL("png");
+        img.setAttribute('crossOrigin', 'anonymous');
+        var canvas = document.createElement("canvas");//1. 获取画布
+        console.log('高度',this.dataLength)
+
+        const num = this.dataLength * 48 + 148;
+        console.log(canvas)
+        canvas.width = 530;//这个设置不能丢，否者会成为canvas默认的300*150的大小
+        canvas.height = num;//这个设置不能丢，否者会成为canvas默认的300*150的大小
+        var ctx = canvas.getContext("2d");//2. 获取画布上下文
+        img.onload=function() {
+          var w = img.width
+          var h = img.height
+          // ctx.drawImage(img, 0, 0, 200, h, 0, 0, 300, 200)
+          ctx.drawImage(img, 0, 0, w, h, 0, 0, w, h)
+          var dataURL = canvas.toDataURL("image/png");
+          console.log('裁切后',dataURL)
+
+          saveFile(dataURL,'images.jpg');
+
+        }
+      })
+    },
+
   }
 };
 </script>

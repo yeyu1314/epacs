@@ -207,7 +207,7 @@
                       <span
                         v-if="oilDeplete!=0"
                         style="display: inline-block;height: 25px;padding: 0 5px;border-bottom: 1px solid"
-                      >{{oilDeplete}}L/100Km</span>
+                      >{{oilDeplete}}L/100km</span>
 
                       <span
                         v-if="oilDeplete==0"
@@ -1092,7 +1092,7 @@ export default {
       this.isShowOpear = true;
       this.isShowSub = false;
       this.carId = row.carId;
-      this.mileNumber = row.mile + "Km";
+      this.mileNumber = row.mile + "km";
       this.p_mileStart = row.mile;
       this.jobId = row.jobId;
       this.jobCode = row.jobCode;

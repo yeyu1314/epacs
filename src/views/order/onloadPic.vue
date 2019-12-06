@@ -115,7 +115,7 @@
           </p>
           <p>
             <span>燃油类型：{{fuelTypeName}}</span>
-            <span>综合油耗：{{oilDeplete}}L/100Km</span>
+            <span>综合油耗：{{oilDeplete}}L/100km</span>
             <span>行驶里程：{{mile}}KM</span>
           </p>
           <div style="display:flex;flex-wrap: wrap;" v-show="this.jobCode==20">

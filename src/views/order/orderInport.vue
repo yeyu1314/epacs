@@ -432,7 +432,7 @@ export default {
       var showInfo =
         "订单时间:" + date.getFullYear() + "年" + month + "月" + day + "日 ";
       showInfo += hour + ":" + min + "<br/>";
-      showInfo += "订单里程:" + rowInfo.lastMile + "Km<br/>";
+      showInfo += "订单里程:" + rowInfo.lastMile + "km<br/>";
       var busType =
         rowInfo.lastCheckType == 3
           ? "检测+治疗"
