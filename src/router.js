@@ -115,6 +115,11 @@ export default new Router({
       name: 'result',
       component: () => import('./views/basedata/result.vue'),
     },
+      {                                                               //测试表格
+        path: "/testTable",
+        name: 'orderInport',
+        component: () => import('./views/testTable.vue'),
+      },
     { //工单录入
       path: "/orderInport",
       name: 'orderInport',
