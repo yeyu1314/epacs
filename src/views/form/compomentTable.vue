@@ -660,17 +660,19 @@
         <!-- 数据表格 -->
         <section class="ces-table">
             <el-table
-                :data='tableData'
-                :size='size'
-                 height="100%"
-                :border  ='isBorder'
-                @select='select'
-                 @select-all='selectAll'
-                 v-loading='loading'
-                 :defaultSelections='defaultSelections'
-                  ref="cesTable">
-                <el-table-column v-if="isSelection" type="selection" align="center" ></el-table-column>
-                <el-table-column v-if="isIndex" type="index" :label="indexLabel" align="center" width="50"></el-table-column>
+                 :data='tableData'
+                 :size='size'
+                  height="100%"
+                 :border  ='isBorder'
+                 @select='select'
+                @select-all='selectAll'
+                v-loading='loading'
+                :defaultSelections='defaultSelections'
+                ref="cesTable">
+                // 复选框
+                <!--<el-table-column v-if="isSelection" type="selection" align="center" ></el-table-column>-->
+                // 序号
+                <!--<el-table-column v-if="isIndex" type="index" :label="indexLabel" align="center" width="50"></el-table-column>-->
                 <!-- 数据栏 -->
                 <el-table-column
                      v-for="item in tableCols"
@@ -682,18 +684,20 @@
                      :render-header="item.require?renderHeader:null"
                 >
                     <template slot-scope="scope" >
-                        <!-- html -->
-                        <span v-if="item.type==='html'" v-html="item.html(scope.row)"></span>
-                        <!-- 按钮 -->
+                        <!-- 按钮                                v-show="btn.isShow"      -->
                         <span v-if="item.type==='button'" >
                             <el-button v-for="btn in item.btnList" :key="btn.label"
                                :disabled="btn.disabled && btn.disabled(scope.row)"
                                :type="btn.type"
                                :size="size || btn.size"
                                :icon="btn.icon"
-                               @click="btn.handle(that,scope.row)">{{btn.label}}
+                               @click="btn.handle(that,scope.row)"
+                               v-show="btn.isShow"
+                            >{{btn.label}}
                             </el-button>
                         </span>
+                        <!-- html -->
+                        <span v-if="item.type==='html'" v-html="item.html(scope.row)"></span>
                         <!-- 输入框 -->
                         <el-input v-if="item.type==='input'" v-model="scope.row[item.prop]" :size="size || btn.size"
                               :disabled="item.isDisabled && item.isDisabled(scope.row)"
@@ -743,13 +747,14 @@
         </section>
         <!-- 分页 -->
         <section class="ces-pagination"  v-if='isPagination'>
-            <el-pagination style='display: flex;justify-content: center;height: 100%;align-items: center;'
-                           @current-change="handleCurrentChange"
-                           @size-change="handleSizeChange"
-                           layout="total,sizes ,prev, pager, next,jumper"
-                           :page-size="tablePage.pageSize"
-                           :current-page="tablePage.pageNum"
-                           :total="tablePage.total"
+            <el-pagination style='display: flex;justify-content: center;height: 100%;align-items: center;margin-top: 20px;'
+                   @current-change="handleCurrentChange"
+                   @size-change="handleSizeChange"
+                   background
+                   layout="total,sizes ,prev, pager, next, jumper"
+                   :page-size="tablePage.pageSize"
+                   :current-page="tablePage.pageNum"
+                   :total="tablePage.total"
             ></el-pagination>
         </section>
     </section>
@@ -835,5 +840,11 @@
     .ces-table-require::before{
         content:'*';
         color:red;
+    }
+    .el-table__row td {
+        text-align: center;
+    }
+    .has-gutter tr th {
+        text-align: center;
     }
 </style>

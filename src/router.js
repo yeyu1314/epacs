@@ -118,7 +118,7 @@ export default new Router({
       {                                                               //测试表格
         path: "/testTable",
         name: 'orderInport',
-        component: () => import('./views/testTable.vue'),
+        component: () => import('./views/form/testTable.vue'),
       },
     { //工单录入
       path: "/orderInport",

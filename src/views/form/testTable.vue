@@ -278,13 +278,35 @@
 
 <template>
     <div class="ces-main">
+        <!--<span>{{tableCols}}</span>-->
         <search-form
+            size='medium '
+            labelWidth = '80px'
+            :searchData = "searchData"
+            :searchForm = "searchForm"
+            :searchHandle="searchHandle">
+        </search-form>
+        <ces-table
+                :that='that'
+                size='medium '
+                :isSelection='true'
+                :isIndex='true'
+                :isPagination='true'
+                :isHandle='true'
+                :tableData='tableData'
+                :tableCols='tableCols'
+                :pagination='pagination'
+        >
+        </ces-table>
+        <!--<ces-search
+                :that='that'
                 size='mini'
-                labelWidth = '80px'
+                labelWidth = '50px'
                 :searchData = "searchData"
                 :searchForm = "searchForm"
-                :searchHandle="searchHandle"></search-form>
+                :searchHandle="searchHandle"></ces-search>
         <ces-table
+                :that='that'
                 size='mini'
                 :isSelection='true'
                 :isIndex='true'
@@ -293,13 +315,14 @@
                 :tableData='tableData'
                 :tableCols='tableCols'
                 :tableHandles='tableHandles'
-                :pagination='pagination'
-        >
-        </ces-table>
+                :tablePage='tablePage'></ces-table>-->
     </div>
 </template>
 
 <script>
+  /*import { createNamespacedHelpers } from 'vuex'
+  const { mapGetters, mapActions } = createNamespacedHelpers('User')*/
+  import {mapState,mapActions} from 'vuex'
   import SearchForm from './searchForm'
   import cesTable from './compomentTable'
   export default {
@@ -307,10 +330,16 @@
 
       let sexs=[{label:'男',value:'M'},{label:'女',value:'F'}]
       let sexProps={label:'label',value:'value'}
-      let intersts=[{label:'羽毛球',value:'badminton'},{label:'篮球',value:'basketball'}]
-      let interstProps={label:'label',value:'value'}
+      // let intersts=[{label:'羽毛球',value:'badminton'},{label:'篮球',value:'basketball'}]
+      // let interstProps={label:'label',value:'value'}
+      let btns = [
+        {type:'primary',label:'编辑',isShow: true, handle:(that,index)=>this.showEditModal(that,index)},
+        {type:'danger',label:'删除',isShow: true,handle:(that,row)=>this.confirmDel(row) }
+      ]
+      let btnProps = {type:'type',label:'label',isShow:'isShow',handle:'handle'}
       return {
-// 查询表单
+        that : this,
+        // 查询表单
         searchData:{
           name:null,
           age:null,
@@ -318,52 +347,115 @@
           interst:null
         },
         searchForm:[
-          {type:'Input',label:'姓名',prop:'name',width:'180px',placeholder:'请输入姓名...'},
-          {type:'Input',label:'年龄',prop:'age',width:'180px',placeholder:'请输入年龄...'},
-          {type:'Select',label:'性别',prop:'sex',width:'180px',options:sexs,props:sexProps,change:row=>'',placeholder:'请选择性别...'},
-          {type:'Checkbox',label:'爱好',width:'180px',prop:'interst',checkboxs:intersts,props:interstProps}
+          // {type:'Input',label:'姓名',prop:'name',width:'180px',placeholder:'请输入姓名...'},
+          {type:'Input',prop:'age',width:'180px',placeholder:'请输入年龄...'},
+          {type:'Select',prop:'sex',width:'180px',options:sexs,props:sexProps,change:row=>this.selectSex(row),placeholder:'请选择性别...'},
+          // {type:'Checkbox',label:'爱好',width:'180px',prop:'interst',checkboxs:intersts,props:interstProps}
+        ],
+        btnArr : [
+          {type:'button',label:'编辑',isShow: true, handle:(that,index)=>this.showEditModal(that,index)}
         ],
         searchHandle:[
-          {label:'查询',type:'primary',handle:()=>''},
-          {label:'重置',type:'primary',handle:()=>''}
+          {label:'查询',icon:"el-icon-search",type:'primary',handle:()=>this.searchNews()},
+          // {label:'重置',type:'primary',handle:()=>''}
         ],
 
-// 表格
-        tableData:[
-          {name:'张三',age:'12',sex:'男',interst:'女'},
-          {name:'筱华',age:'27',sex:'女',interst:'羽毛球'},
-          {name:'张三',age:'12',sex:'男',interst:'女'},
-          {name:'筱华',age:'27',sex:'女',interst:'羽毛球'},
-          {name:'筱华',age:'27',sex:'女',interst:'羽毛球'},
-          {name:'筱华',age:'27',sex:'女',interst:'羽毛球'},
-          {name:'筱华',age:'27',sex:'女',interst:'羽毛球'}
-
-        ],
+        // 表格
+        // tableData:[
+        //   {name:'张三',age:'12',sex:'男',interst:'女',},
+        //   {name:'筱华',age:'27',sex:'女',interst:'羽毛球'},
+        //   {name:'张三',age:'12',sex:'男',interst:'女'},
+        //   {name:'筱华',age:'27',sex:'女',interst:'羽毛球'},
+        //   {name:'筱华',age:'27',sex:'女',interst:'羽毛球'},
+        //   {name:'筱华',age:'27',sex:'女',interst:'羽毛球'},
+        //   {name:'筱华',age:'27',sex:'女',interst:'羽毛球'}
+        //
+        // ],
         tableCols:[
           {label:'姓名',prop:'name'},
           {label:'年龄',prop:'age'},
           {label:'性别',prop:'sex'},
           {label:'爱好',prop:'interst'},
           {label:'操作',type:'button',btnList:[
-              {type:'primary',label:'编辑',handle:row=>''},
-              {type:'danger',label:'删除',handle:row=>''}
+              // {type:'primary',label:'编辑',handle:(that,row)=>that.showEditModal(row)},
+              // {type:'primary',label:'编辑',isShow:state.tableData.showEdit,handle:(that,index)=>this.showEditModal(that,index)},
+              {type:'primary',label:'编辑',isShow: true, handle:(that,index)=>this.showEditModal(that,index)},
+              {type:'danger',label:'删除',isShow: true,handle:(that,row)=>this.confirmDel(row) }
             ]}
         ],
-        tableHandles:[
-          {label:'新增',type:'primary',handle:row=>''}
-        ],
+        // tableHandles:[
+        //   {label:'新增',type:'primary',handle:row=>''}
+        // ],
         pagination:{
           pageSize:10,
           pageNum:1,
-          total:7
-        }
+          total:14
+        },
       }
     },
     components:{
       cesTable,
       SearchForm
+    },
+    methods : {
+      // ...mapActions(['showEditModal'])
+      showEditModal (that,index) {// 编辑
+        console.log("点击了编辑",that)
+        console.log("点击了编辑",index.id)
+        console.log("点击了编辑",that.tableCols)
+      },
+      confirmDel (row) {
+        console.log(row)
+      },
+      selectSex (row) {
+        console.log(row)
+        this.yeyu()
+      },
+      yeyu(){
+        const {tableData} = this
+        for (let i = 1; i< tableData.length; i++) {
+          this.showDel = tableData[i].showDel
+          console.log(this.showDel)
+        }
+      },
+    },
+    computed : {
+      ...mapState(['tableData',]), //读数据
+    },
+    mounted () {
+      // this.$store.dispatch('getDatas')//提交一个事件
+    },
+  }
+
+
+/*
+
+  export default {
+    data () {
+      return {
+        that:this
+      }
+    },
+    components:{
+      SearchForm,
+      cesTable,
+    },
+    computed:{
+      ...mapGetters([
+        'searchData','searchForm','searchHandle',
+        'loading','tableData','tableCols','tableHandles','tablePage',
+        'modalCfg',
+        'editForm','editData','editRules'])
+    },
+    methods:{
+      ...mapActions(['init','showEditModal','hideEditModal','getData','resetData','validateAdd','confirmDel','validateEdit'])
+    },
+    mounted(){
+      this.init()
     }
   }
+*/
+
 </script>
 
 <style>
