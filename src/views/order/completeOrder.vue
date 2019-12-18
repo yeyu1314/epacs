@@ -337,6 +337,7 @@ export default {
       net
         .request("admin/order/queryOrderById", "post", { id: row.jobId })
         .then(res => {
+          console.log(res.data.list)
           this.seeArr = res.data.list;
         });
     },

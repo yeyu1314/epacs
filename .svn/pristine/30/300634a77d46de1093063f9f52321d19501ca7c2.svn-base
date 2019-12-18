@@ -6,7 +6,7 @@
         <label style="color:red">未经过人工审核</label>确认之后，进入
         <label style="color:red">比对数据库</label>的数据
       </div>
-      <div class="search" v:if="showSearchBox">
+      <div class="search">
         <div class="p_select">
           <el-select v-model="selectedBrand" clearable placeholder="请选择品牌" @change="brandChange">
             <el-option
@@ -108,13 +108,6 @@
             <el-table-column prop="seriesName" label="车系" align="center" min-width="200"></el-table-column>
             <el-table-column prop="areaName" label="地区" align="center" min-width="200"></el-table-column>
             <el-table-column prop="total" label="未审核数量" align="center" min-width="200"></el-table-column>
-          </el-table>
-        </el-tab-pane>
-        <!-- 不通过原因tab -->
-        <el-tab-pane label="不通过原因统计">
-          <el-table :data="failCountListData" border style="width: 100%">
-            <el-table-column prop="note" label="不通过原因" align="center" min-width="200"></el-table-column>
-            <el-table-column prop="total" label="数量" align="center" min-width="200"></el-table-column>
           </el-table>
         </el-tab-pane>
       </el-tabs>
@@ -262,7 +255,6 @@ export default {
   inject: ["reload"],
   data() {
     return {
-      showSearchBox:true,
       orgin: "", //维修站
       orginArr: [],
       tabIndex: "0",
@@ -277,7 +269,6 @@ export default {
       carNumber: null,
       tableData: [], //存放表格数据
       countListData: [], //存放统计表格数据
-      failCountListData:[],//不通过统计数据
       pageNumber: 1, //页码
       numberOfPages: 10, //每页条数
       licensePlate: null,
@@ -480,40 +471,12 @@ export default {
           }
         });
     },
-    getFailCountList() {
-      net
-        .request(
-          "admin/ai/queryAIFailPhotoCount",
-          "post",
-          { pageNo: this.pageNumber, pageSize: this.numberOfPages },
-          {
-            // carNumber: this.carNumber,
-            // brandId: this.selectedBrand,
-            // factoryId: this.selectedHost,
-            // seriesId: this.selectedSeries,
-            // areaId: this.selectedArea,
-            // orgId: this.orgin
-          }
-        )
-        .then(res => {
-          if (res.retcode == 1) {
-            this.failCountListData = res.data;
-          } else {
-            this.$message.error(res.retmsg);
-          }
-        });
-    },
     //搜索
     clickSearch() {
       if (this.tabIndex == 0) {
-        this.showSearchBox = true;
         this.getDataList();
-      } else if (this.tabIndex == 1){
-        this.showSearchBox = true;
+      } else {
         this.getCountList();
-      } else if (this.tabIndex == 2){
-        this.showSearchBox = false;
-        this.getFailCountList();
       }
     },
     //ai校验

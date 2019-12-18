@@ -518,7 +518,6 @@ export default {
     },
     //ai校验
     handleClick(row) {
-      this.partImgArr = [];//清空图片
       this.check = !this.check;
       this.numberPlate = row.carNumber;
       this.modelName = row.modelName;

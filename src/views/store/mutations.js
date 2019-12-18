@@ -1,9 +1,9 @@
 /*
 直接更新state的多个方法的对象
  */
-// import {SHOW_EDIT_MODAL} from './mutation_types'
+import {RECEIVE_BTN_LIST} from './mutation_types'
 export default {
-  // [SHOW_EDIT_MODAL](state,{row}){
-  //   state.row = row
-  // },
+  [RECEIVE_BTN_LIST](state,{newBtnList}){
+    state.newBtnList = newBtnList
+  },
 }
