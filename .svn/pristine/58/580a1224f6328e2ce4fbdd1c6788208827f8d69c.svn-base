@@ -279,6 +279,470 @@
 
 
 <!--
+<template>
+    <div class="ces-main">
+        &lt;!&ndash;<span>{{tableCols}}</span>&ndash;&gt;
+        <search-form
+            size='medium '
+            labelWidth = '80px'
+            :searchData = "searchData"
+            :searchForm = "searchForm"
+            :searchHandle="searchHandle">
+        </search-form>
+        <ces-table
+                :that='that'
+                size='small '
+                :isSelection='true'
+                :isIndex='true'
+                :isHandle='true'
+                :tableData='tableData'
+                :tableCols='tableCols'
+                :newBtnList="newBtnList"
+                :checkButtonList="checkButtonList"
+                :reviewButtonList="reviewButtonList"
+                :remarkButtonList="remarkButtonList"
+                :isPagination='true'
+                :tablePage='pagination'
+                @CurrentChange = 'CurrentChange'
+                @SizeChange = 'SizeChange'
+                :longDatas="longDatas"
+        >
+        </ces-table>
+        <operating-record
+                :that='that'
+                :redordData='redordData'
+                :redordCols='redordCols'
+                :isShowRecord="isShowRecord"
+                @closeTip="closeTip"
+        >
+
+        </operating-record>
+        <edit-form
+                :that="that"
+                :editCfg="editCfg"
+                :editData="editData"
+                :editRules="editRules"
+                :showEdit = "showEdit"
+                @closeTip="closeTip"
+                :title="title"
+                @handleSubmit="handleSubmit"
+        >
+
+        </edit-form>
+    </div>
+</template>
+
+<script>
+  import net from "../../assets/js/public";
+  import {mapState,mapActions} from 'vuex'
+  import SearchForm from './searchForm'
+  import cesTable from './compomentTable'
+  import operatingRecord from './operatingRecord'
+  import editForm from './editForm'
+  import moment from 'moment'
+  export default {
+    data () {
+      let checkTypes=[{label:'全部',value:'0'},{label:'检测',value:'1'},{label:'治疗',value:'2'},{label:'检测+治疗',value:'3'}]
+      let checkTypeProps={label:'label',value:'value'}
+      return {
+        that : this,
+        // 查询表单
+        searchData:{
+          carNumber:null,
+          carMsg:null,
+          station:null,
+          checkType:null
+        },
+        searchForm:[//搜索栏
+          {type:'Input',prop:'carNumber',width:'180px',placeholder:'请输入车牌'},
+          {type:'Input',prop:'carMsg',width:'180px',placeholder:'请输入车系'},
+          {type:'Input',prop:'station',width:'180px',placeholder:'请输入维修站'},
+          {type:'Select',prop:'checkType',width:'180px',options:checkTypes,props:checkTypeProps,change:row=>this.selectCheckType(row),placeholder:'请选择业务类型'},
+        ],
+        searchHandle:[//搜索按钮
+          {label:'查询',icon:"el-icon-search",type:'primary',handle:()=>this.searchNews()},
+        ],
+
+
+        tableData : [],// 表格数据
+        newBtnList:[],// 按钮列表
+        checkButtonList : [],
+        reviewButtonList : [],
+        remarkButtonList : [],
+        tableCols:[// 表头
+          {label:'车牌',prop:'carNumber'},
+          {label:'车辆信息',type:'longData'},
+          // {label:'车辆信息',prop:'carMsg'},
+          {label:'下单时间',prop:'inputTime'},
+          {label:'业务类型',prop:'checkType'},
+          {label:'故障描述',prop:'note'},
+          {label:'发动机数量',prop:'carCylinder'},
+          {label:'检测报告',type:'checkButton',},
+          {label:'复查报告',type:'reviewButton',},
+          {label:'备注',type:'remarkButton',},
+          {label:'操作记录',type:'Button',btnList:[
+              {type:'success',label:'查看',handle:(row,that)=>this.showRecord(row,that)},
+            ]},
+        ],
+        longDatas : [],
+        pagination:{
+          pageSize:10,
+          pageNum:1,
+          total:0
+        },
+        orderPageShowOrgName : false,
+        pageNo: 1,
+        pageSize: 10,
+        page: this.$route.params,
+        redordCols : [
+          {label:'操作人',prop:'userName'},
+          {label:'操作内容',prop:'remarks'},
+          {label:'操作时间',prop:'inputTime'},
+        ],
+        redordData : [],
+        isShowRecord : false,//操作记录弹窗
+        editCfg:[
+          {label:'车牌',prop:'carNumber',type:'input',width:'280px'},
+          {label:'车系',prop:'carMsg',type:'input',width:'280px'},
+          {label:'维修站',prop:'station',type:'input',width:'280px'},
+          {label:'下单时间',prop:'inputTime',type:'dateTime',width:'280px'},
+          {label:'业务类型',prop:'checkType',type:'select',options:checkTypes,props:checkTypeProps,width:'280px'}
+        ],
+        editData:{
+          carNumber:null,
+          carMsg:null,
+          station:null,
+          checkType:null,
+          inputTime : null
+        },
+        editRules:{
+          name:[
+            { required: true, message: '请输入姓名', trigger: 'blur' },
+          ]
+        },
+        title : '',
+        showEdit : false,//form弹窗
+      }
+    },
+    components:{
+      cesTable,
+      SearchForm,
+      operatingRecord,
+      editForm,
+    },
+    methods : {
+      record(jobId, step) {
+        net
+          .request("/admin/order/OperationMark", "post", {
+            jobId: jobId,
+            step: step
+          })
+          .then(res => {
+            console.log(res);
+          });
+      },
+      // 点击 查看检查报告
+      showCheck (that,row) {
+        console.log("点击了查看检查报告",row)
+        this.record(row.jobId, 1);
+        this.$router.push({
+          name: "InitSurvey",
+          params: {
+            operId: 1,
+            row: row.allData,
+            pageNo: this.pagination.pageNum,
+            pageSize: this.pagination.pageSize,
+            carNumber: this.searchData.carNumber,
+            enter: true,
+            print: true
+          }
+        });
+      },
+      // 点击 查看复查报告
+      showReview (row,that) {
+        console.log("点击了查看复查报告",row,that)
+        this.record(that.jobId, 2);
+        this.$router.push({
+          name: "recheck",
+          params: {
+            operId: 2,
+            row: row.allData,
+            pageNo: this.pagination.pageNum,
+            pageSize: this.pagination.pageSize,
+            carNumber: this.searchData.carNumber,
+            enter: false
+          }
+        });
+      },
+      // 点击 备注项
+      showRemark (row,that) {
+        console.log("点击了备注项",row,that)
+      },
+      selectCheckType (row) {//类型下拉框
+        console.log(row)
+      },
+      // 显示操作记录
+      showRecord (row,that) {
+        this.isShowRecord = true
+        net
+          .request("admin/order/queryOrderById", "post", { id: that.jobId })
+          .then(res => {
+            if (res.retcode == 1) {
+              const data = res.data.list
+              const redordData = []
+              for (let i = 0; i < data.length; i++){
+                redordData.push(
+                  {
+                    id : data[i].id,
+                    userName : data[i].userName,
+                    remarks : data[i].remarks,
+                    inputTime : moment(data[i].inputTime).format('YYYY-MM-DD HH:MM'),
+                  }
+                )
+              }
+              this.redordData = redordData
+            }else {
+              net.message(this, res.retmsg, "warning");
+            }
+
+          });
+
+        /*this.editData = {// 给弹窗赋值
+          carNumber:that.carNumber,
+          carMsg:that.carMsg,
+          station:that.note,
+          checkType:that.checkType,
+          inputTime : that.inputTime
+        }
+        this.title = '车辆信息'
+        this.showEdit = true*/
+      },
+      //关闭弹窗
+      closeTip() {
+        console.log("关闭弹窗")
+        this.isShowRecord = false// 关闭操作记录弹窗
+        this.showEdit = false// 关闭form表单弹窗
+        this.editData = {}      // 清空form表单编辑弹窗
+        this.redordData = []
+      },
+      // 提交弹窗内容
+      handleSubmit(){
+        const aaa = this.editData
+        console.log('点击了确定',aaa)
+      },
+
+    // 获取表格数据
+      getlistData(param, data) {
+        this.tableData = []
+        net
+          .request("admin/order/queryListPage", "post", param, data)
+          .then(res => {
+            if (res.retcode == 1) {
+              // this.listData = res.data.rows;
+              // this.pagination.total = res.data.total;
+              const pagination = {
+                pageSize : res.data.pageSize,
+                pageNum : res.data.pageNo,
+                total : res.data.total,
+              }
+              this.pagination = pagination
+            } else {
+              net.message(this, "获取数据失败", "warning");
+            }
+            // console.log(res);
+            const tableArr = []
+            const carMsgArr = []
+            const data = res.data.rows
+            console.log(data)
+            //封装表格数据
+            for (let i = 0; i< data.length; i++){
+              tableArr.push({
+                    id:i +1,
+                    carNumber:data[i].carNumber,//车牌
+                    inputTime:moment(data[i].inputTime).format('YYYY-MM-DD HH:MM'),//下单时间
+                    checkType:data[i].checkType === 1 ? '检测' : (data[i].checkType === 3 ? '治疗+检测' : '治疗'),//业务类型
+                    checkTypeId : data[i].checkType,
+                    note:data[i].note,//故障描述
+                    carCylinder:data[i].carCylinder,//发动机缸数
+                    jobCode : data[i].jobCode,
+                    //车辆信息
+                    factoryName:data[i].factoryName,
+                    seriesName:data[i].seriesName,
+                    modelName:data[i].modelName,
+                    jobId : data[i].jobId,
+
+                    allData : data[i],
+                })
+              carMsgArr.push({//封装车辆信息格式
+                    id : i+1,
+                    note:[
+                      data[i].factoryName,
+                      data[i].seriesName,
+                      data[i].modelName,
+                    ]
+              })
+            }
+            this.tableData = tableArr
+            this.longDatas = carMsgArr
+
+            // 按钮的显示隐藏
+            const checkButtonArr = []
+            const checkButtonList = []// 二维数组
+            const reviewButtonArr = []
+            const reviewButtonList = []
+            const remarkButtonArr = []
+            const remarkButtonList = []
+            for (let i = 0; i < tableArr.length; i++) {
+              if(tableArr[i].checkTypeId === 1 || tableArr[i].checkTypeId === 3) {// 控制显示隐藏的条件    1-&#45;&#45;检测 2&#45;&#45;&#45;&#45;治疗  3 &#45;&#45;&#45;&#45;检测+治疗
+                checkButtonArr.push({id:i,type:'primary',label:'查看检测报告',isShow: true,size:'small ', handle:(row,that)=>this.showCheck(row,that)})
+              }else {
+                checkButtonArr.push({id:i,type:'primary',label:'查看检测报告',isShow: false,})
+              }
+              if(tableArr[i].jobCode === 1000){
+                reviewButtonArr.push({id:i,type:'warning',label:'查看复查报告',isShow: true, handle:(row,that)=>this.showReview(row,that)})
+              }else {
+                reviewButtonArr.push({id:i,type:'warning',label:'查看复查报告',isShow: false,} )
+              }
+              if(tableArr[i].jobCode === 1000 || tableArr[i].jobCode === 1010){
+                remarkButtonArr.push({id:i,type:'success',label:'备注项',isShow: true, handle:(row,that)=>this.showRemark(row,that)})
+              }else {
+                remarkButtonArr.push({id:i,type:'success',label:'备注项',isShow: false,} )
+              }
+            }
+            // 封装按钮格式
+            let reviewArr = [] //一维数组（长度为2）
+            let checkArr = []
+            let remarkArr = []
+            checkButtonArr.forEach((c,index) => {
+              if (checkArr.length === 1) {//如果小数组已经满了，创建一个新的  （两个为一组）
+                checkArr = []
+              }
+              if(checkArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
+                checkButtonList.push({
+                  id : index  +1,
+                  btnList : checkArr
+                })
+              }
+              checkArr.push(c)//将当前分类保存到小数组中
+            })
+            reviewButtonArr.forEach((c,index) => {
+              if (reviewArr.length === 1) {//如果小数组已经满了，创建一个新的  （两个为一组）
+                reviewArr = []
+              }
+              if(reviewArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
+                reviewButtonList.push({
+                  id : index  +1,
+                  btnList : reviewArr
+                })
+              }
+              reviewArr.push(c)//将当前分类保存到小数组中
+            })
+            remarkButtonArr.forEach((c,index) => {
+              if (remarkArr.length === 1) {//如果小数组已经满了，创建一个新的  （两个为一组）
+                remarkArr = []
+              }
+              if(remarkArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
+                remarkButtonList.push({
+                  id : index  +1,
+                  btnList : remarkArr
+                })
+              }
+              remarkArr.push(c)//将当前分类保存到小数组中
+            })
+            this.checkButtonList = checkButtonList
+            this.reviewButtonList = reviewButtonList
+            this.remarkButtonList = remarkButtonList
+
+          });
+      },
+
+    //翻页
+      CurrentChange(val){
+        console.log(val)
+        this.pagination.pageNum = val;
+        this.getlistData(
+          { pageNo: val, pageSize: this.pagination.pageSize },
+          {
+            type: 9,
+            carNumber: this.searchData.carNumber,
+            orgName: this.searchData.carMsg,
+            seriesName: this.searchData.station,
+            checkType: this.searchData.checkType
+          }
+        );
+      },
+    //选择 每页显示数量
+      SizeChange(val){
+        this.pagination.pageSize = val;
+        this.getlistData(
+          { pageNo: this.pagination.pageNum, pageSize: val },
+          {
+            type: 9,
+            carNumber: this.searchData.carNumber,
+            orgName: this.searchData.carMsg,
+            seriesName: this.searchData.station,
+            checkType: this.searchData.checkType
+          }
+        );
+      },
+      //查询
+      searchNews(){
+        const carNumber = this.searchData.carNumber
+        const carMsg = this.searchData.carMsg
+        const station = this.searchData.station
+        const checkType = this.searchData.checkType
+        this.getlistData(
+          { pageNo: 1, pageSize: 10 },
+          {
+            type: 9,
+            carNumber: carNumber,
+            orgName: carMsg,
+            seriesName: station,
+            checkType: checkType
+          }
+        );
+      }
+
+    },
+    created () {
+      // this.$store.dispatch('recordBtnList')//提交一个事件
+      const signInfo = JSON.parse(sessionStorage.getItem("signInfo"));
+      this.orderPageShowOrgName = signInfo.orgId == 0;
+      let flag = localStorage.getItem("orgSearch");
+      if (flag) {
+        this.orgSearch = flag;
+      }
+      if (this.page.pageNo == undefined) {
+        this.getlistData(
+          { pageNo: this.pageNo, pageSize: this.pageSize },
+          { type: 9, orgName: flag ? localStorage.getItem("orgSearch") : "" }
+        );
+      } else {
+        this.getlistData(
+          { pageNo: this.page.pageNo, pageSize: this.page.pageSize },
+          {
+            type: 9,
+            carNumber: this.page.carNumber,
+            orgName: flag ? localStorage.getItem("orgSearch") : ""
+          }
+        );
+      }
+
+    },
+    computed : {
+      // ...mapState(['tableData','newBtnList']), //读数据
+    },
+  }
+
+
+</script>
+
+<style>
+
+</style>-->
+
+
+<!--
 
 <template>
     <div class="app-container calendar-list-container">
@@ -467,487 +931,10 @@
 
 
 
-<!-- 完成工单列表-->
-<!--<template>
-    <div class="ces-main">
-        &lt;!&ndash;<span>{{tableCols}}</span>&ndash;&gt;
-        <search-form
-            size='medium '
-            labelWidth = '80px'
-            :searchData = "searchData"
-            :searchForm = "searchForm"
-            :searchHandle="searchHandle">
-        </search-form>
-        <ces-table
-                :that='that'
-                size='small '
-                :isSelection='true'
-                :isIndex='true'
-                :isHandle='true'
-                :tableData='tableData'
-                :tableCols='tableCols'
-                :newBtnList="newBtnList"
-                :checkButtonList="checkButtonList"
-                :reviewButtonList="reviewButtonList"
-                :remarkButtonList="remarkButtonList"
-                :isPagination='true'
-                :tablePage='pagination'
-                @CurrentChange = 'CurrentChange'
-                @SizeChange = 'SizeChange'
-                :longDatas="longDatas"
-        >
-        </ces-table>
-        <operating-record
-                :that='that'
-                :redordData='redordData'
-                :redordCols='redordCols'
-                :isShowRecord="isShowRecord"
-                @closeTip="closeTip"
-        >
-
-        </operating-record>
-        <edit-form
-                :that="that"
-                :editCfg="editCfg"
-                :editData="editData"
-                :editRules="editRules"
-                :showEdit = "showEdit"
-                @closeTip="closeTip"
-                :title="title"
-                @handleSubmit="handleSubmit"
-        >
-
-        </edit-form>
-    </div>
-</template>
-
-<script>
-  import net from "../../assets/js/public";
-  import {mapState,mapActions} from 'vuex'
-  import SearchForm from './searchForm'
-  import cesTable from './compomentTable'
-  import operatingRecord from './operatingRecord'
-  import editForm from './editForm'
-  import moment from 'moment'
-  export default {
-    data () {
-      let checkTypes=[{label:'全部',value:'0'},{label:'检测',value:'1'},{label:'治疗',value:'2'},{label:'检测+治疗',value:'3'}]
-      let checkTypeProps={label:'label',value:'value'}
-      return {
-        that : this,
-        pagination:{
-          pageNum:1,
-          pageSize:10,
-          total:0
-        },
-        searchHandle:[//搜索按钮
-          {label:'查询',icon:"el-icon-search",type:'primary',handle:()=>this.searchNews()},
-        ],
-        searchData:{// 查询表单
-          carNumber:null,
-          carMsg:null,
-          station:null,
-          checkType:null
-        },
-        searchForm:[//搜索栏
-          {type:'Input',prop:'carNumber',width:'180px',placeholder:'请输入车牌'},
-          {type:'Input',prop:'carMsg',width:'180px',placeholder:'请输入车系'},
-          {type:'Input',prop:'station',width:'180px',placeholder:'请输入维修站'},
-          {type:'Select',prop:'checkType',width:'180px',options:checkTypes,props:checkTypeProps,placeholder:'请选择业务类型'},
-        ],
-        editCfg:[// 编辑form表单
-          {label:'车牌',prop:'carNumber',type:'input',width:'280px'},
-          {label:'车系',prop:'carMsg',type:'input',width:'280px'},
-          {label:'维修站',prop:'station',type:'input',width:'280px'},
-          {label:'下单时间',prop:'inputTime',type:'dateTime',width:'280px'},
-          {label:'业务类型',prop:'checkType',type:'select',options:checkTypes,props:checkTypeProps,width:'280px'}
-        ],
-        editData:{// 编辑form数据
-          carNumber:null,
-          carMsg:null,
-          station:null,
-          checkType:null,
-          inputTime : null
-        },
-        redordCols : [//操作记录表头
-          {label:'操作人',prop:'userName'},
-          {label:'操作内容',prop:'remarks'},
-          {label:'操作时间',prop:'inputTime'},
-        ],
-
-
-        tableData : [],// 表格数据
-        newBtnList:[],// 按钮列表
-        checkButtonList : [],
-        reviewButtonList : [],
-        remarkButtonList : [],
-
-        tableCols:[// 表头
-          {label:'车牌',prop:'carNumber'},
-          {label:'车辆信息',type:'longData'},
-          {label:'下单时间',prop:'inputTime'},
-          {label:'业务类型',prop:'checkType'},
-          {label:'故障描述',prop:'note'},
-          {label:'发动机数量',prop:'carCylinder'},
-          {label:'检测报告',type:'checkButton',},
-          {label:'复查报告',type:'reviewButton',},
-          {label:'备注',type:'remarkButton',},
-          {label:'操作记录',type:'Button',btnList:[
-              {type:'success',label:'查看',handle:(row,that)=>this.showRecord(row,that)},
-            ]},
-        ],
-        longDatas : [],
-
-        orderPageShowOrgName : false,
-        pageNo: 1,
-        pageSize: 10,
-        page: this.$route.params,
-
-        redordData : [],
-        isShowRecord : false,//操作记录弹窗
-        editRules:{
-          name:[
-            { required: true, message: '请输入姓名', trigger: 'blur' },
-          ]
-        },
-        title : '',
-        showEdit : false,//form弹窗
-
-        aaa : ''
-
-      }
-    },
-    components:{
-      cesTable,
-      SearchForm,
-      operatingRecord,
-      editForm,
-    },
-    methods : {
-      // ...mapActions(['getData',]),
-      record(jobId, step) {
-        net
-          .request("/admin/order/OperationMark", "post", {
-            jobId: jobId,
-            step: step
-          })
-          .then(res => {
-            console.log(res);
-          });
-      },
-      // 点击 查看检查报告
-      showCheck (that,row) {
-        console.log("点击了查看检查报告",row)
-        this.record(row.jobId, 1);
-        this.$router.push({
-          name: "InitSurvey",
-          params: {
-            operId: 1,
-            row: row.allData,
-            pageNo: this.pagination.pageNum,
-            pageSize: this.pagination.pageSize,
-            carNumber: this.searchData.carNumber,
-            enter: true,
-            print: true
-          }
-        });
-      },
-      // 点击 查看复查报告
-      showReview (row,that) {
-        console.log("点击了查看复查报告",row,that)
-        this.record(that.jobId, 2);
-        this.$router.push({
-          name: "recheck",
-          params: {
-            operId: 2,
-            row: row.allData,
-            pageNo: this.pagination.pageNum,
-            pageSize: this.pagination.pageSize,
-            carNumber: this.searchData.carNumber,
-            enter: false
-          }
-        });
-      },
-      // 点击 备注项
-      showRemark (row,that) {
-        console.log("点击了备注项",row,that)
-      },
-      selectCheckType (row) {//类型下拉框
-        console.log(row)
-      },
-      // 显示操作记录
-      showRecord (row,that) {
-        this.isShowRecord = true
-        net
-          .request("admin/order/queryOrderById", "post", { id: that.jobId })
-          .then(res => {
-            if (res.retcode == 1) {
-              const data = res.data.list
-              const redordData = []
-              for (let i = 0; i < data.length; i++){
-                redordData.push(
-                  {
-                    id : data[i].id,
-                    userName : data[i].userName,
-                    remarks : data[i].remarks,
-                    inputTime : moment(data[i].inputTime).format('YYYY-MM-DD HH:MM'),
-                  }
-                )
-              }
-              this.redordData = redordData
-            }else {
-              net.message(this, res.retmsg, "warning");
-            }
-
-          });
-
-        /*this.editData = {// 给弹窗赋值
-          carNumber:that.carNumber,
-          carMsg:that.carMsg,
-          station:that.note,
-          checkType:that.checkType,
-          inputTime : that.inputTime
-        }
-        this.title = '车辆信息'
-        this.showEdit = true*/
-      },
-      //关闭弹窗
-      closeTip() {
-        console.log("关闭弹窗")
-        this.isShowRecord = false// 关闭操作记录弹窗
-        this.showEdit = false// 关闭form表单弹窗
-        // this.editData = {}      // 清空form表单编辑弹窗
-        this.redordData = []
-      },
-      // 提交弹窗内容
-      handleSubmit(){
-        const aaa = this.editData
-        console.log('点击了确定',aaa)
-      },
-
-    // 获取表格数据
-      getlistData(param, data) {
-        this.tableData = []
-        net
-          .request("admin/order/queryListPage", "post", param, data)
-          .then(res => {
-            if (res.retcode == 1) {
-              // this.listData = res.data.rows;
-              // this.pagination.total = res.data.total;
-              const pagination = {
-                pageSize : res.data.pageSize,
-                pageNum : res.data.pageNo,
-                total : res.data.total,
-              }
-              this.pagination = pagination
-            } else {
-              net.message(this, "获取数据失败", "warning");
-            }
-            // console.log(res);
-            const tableArr = []
-            const carMsgArr = []
-            const data = res.data.rows
-            console.log(data)
-            //封装表格数据
-            for (let i = 0; i< data.length; i++){
-              tableArr.push({
-                    id:i +1,
-                    carNumber:data[i].carNumber,//车牌
-                    inputTime:moment(data[i].inputTime).format('YYYY-MM-DD HH:MM'),//下单时间
-                    checkType:data[i].checkType === 1 ? '检测' : (data[i].checkType === 3 ? '治疗+检测' : '治疗'),//业务类型
-                    checkTypeId : data[i].checkType,
-                    note:data[i].note,//故障描述
-                    carCylinder:data[i].carCylinder,//发动机缸数
-                    //车辆信息
-                    factoryName:data[i].factoryName,
-                    seriesName:data[i].seriesName,
-                    modelName:data[i].modelName,
-
-                    jobCode : data[i].jobCode,
-                    jobId : data[i].jobId,
-                    allData : data[i],
-                })
-              carMsgArr.push({//封装车辆信息格式
-                    id : i+1,
-                    note:[
-                      data[i].factoryName,
-                      data[i].seriesName,
-                      data[i].modelName,
-                    ]
-              })
-            }
-            this.tableData = tableArr
-            this.longDatas = carMsgArr
-
-            // 按钮的显示隐藏
-            const checkButtonArr = []
-            const checkButtonList = []// 二维数组
-            const reviewButtonArr = []
-            const reviewButtonList = []
-            const remarkButtonArr = []
-            const remarkButtonList = []
-            for (let i = 0; i < tableArr.length; i++) {
-              if(tableArr[i].checkTypeId === 1 || tableArr[i].checkTypeId === 3) {// 控制显示隐藏的条件    1-&#45;&#45;检测 2&#45;&#45;&#45;&#45;治疗  3 &#45;&#45;&#45;&#45;检测+治疗
-                checkButtonArr.push({id:i,type:'primary',label:'查看检测报告',isShow: true,size:'small ', handle:(row,that)=>this.showCheck(row,that)})
-              }else {
-                checkButtonArr.push({id:i,type:'primary',label:'查看检测报告',isShow: false,})
-              }
-              if(tableArr[i].jobCode === 1000){
-                reviewButtonArr.push({id:i,type:'warning',label:'查看复查报告',isShow: true, handle:(row,that)=>this.showReview(row,that)})
-              }else {
-                reviewButtonArr.push({id:i,type:'warning',label:'查看复查报告',isShow: false,} )
-              }
-              if(tableArr[i].jobCode === 1000 || tableArr[i].jobCode === 1010){
-                remarkButtonArr.push({id:i,type:'success',label:'备注项',isShow: true, handle:(row,that)=>this.showRemark(row,that)})
-              }else {
-                remarkButtonArr.push({id:i,type:'success',label:'备注项',isShow: false,} )
-              }
-            }
-            // 封装按钮格式
-            let reviewArr = [] //一维数组（长度为2）
-            let checkArr = []
-            let remarkArr = []
-            checkButtonArr.forEach((c,index) => {
-              if (checkArr.length === 1) {//如果小数组已经满了，创建一个新的  （两个为一组）
-                checkArr = []
-              }
-              if(checkArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
-                checkButtonList.push({
-                  id : index  +1,
-                  btnList : checkArr
-                })
-              }
-              checkArr.push(c)//将当前分类保存到小数组中
-            })
-            reviewButtonArr.forEach((c,index) => {
-              if (reviewArr.length === 1) {//如果小数组已经满了，创建一个新的  （两个为一组）
-                reviewArr = []
-              }
-              if(reviewArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
-                reviewButtonList.push({
-                  id : index  +1,
-                  btnList : reviewArr
-                })
-              }
-              reviewArr.push(c)//将当前分类保存到小数组中
-            })
-            remarkButtonArr.forEach((c,index) => {
-              if (remarkArr.length === 1) {//如果小数组已经满了，创建一个新的  （两个为一组）
-                remarkArr = []
-              }
-              if(remarkArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
-                remarkButtonList.push({
-                  id : index  +1,
-                  btnList : remarkArr
-                })
-              }
-              remarkArr.push(c)//将当前分类保存到小数组中
-            })
-            this.checkButtonList = checkButtonList
-            this.reviewButtonList = reviewButtonList
-            this.remarkButtonList = remarkButtonList
-
-          });
-      },
-
-    //翻页
-      CurrentChange(val){
-        console.log(val)
-        this.pagination.pageNum = val;
-        this.getlistData(
-          { pageNo: val, pageSize: this.pagination.pageSize },
-          {
-            type: 9,
-            carNumber: this.searchData.carNumber,
-            orgName: this.searchData.carMsg,
-            seriesName: this.searchData.station,
-            checkType: this.searchData.checkType
-          }
-        );
-      },
-    //选择 每页显示数量
-      SizeChange(val){
-        this.pagination.pageSize = val;
-        this.getlistData(
-          { pageNo: this.pagination.pageNum, pageSize: val },
-          {
-            type: 9,
-            carNumber: this.searchData.carNumber,
-            orgName: this.searchData.carMsg,
-            seriesName: this.searchData.station,
-            checkType: this.searchData.checkType
-          }
-        );
-      },
-      //查询
-      searchNews(){
-        const carNumber = this.searchData.carNumber
-        const carMsg = this.searchData.carMsg
-        const station = this.searchData.station
-        const checkType = this.searchData.checkType
-        console.log(carNumber,carMsg,station,checkType)
-        // this.getlistData(
-        //   { pageNo: 1, pageSize: 10 },
-        //   {
-        //     type: 9,
-        //     carNumber: carNumber,
-        //     orgName: carMsg,
-        //     seriesName: station,
-        //     checkType: checkType
-        //   }
-        // );
-      }
-
-    },
-    created () {
-      // this.$store.dispatch('recordBtnList')//提交一个事件
-      const signInfo = JSON.parse(sessionStorage.getItem("signInfo"));
-      this.orderPageShowOrgName = signInfo.orgId == 0;
-      let flag = localStorage.getItem("orgSearch");
-      if (flag) {
-        this.orgSearch = flag;
-      }
-      if (this.page.pageNo == undefined) {
-        this.getlistData(
-          { pageNo: this.pageNo, pageSize: this.pageSize },
-          { type: 9, orgName: flag ? localStorage.getItem("orgSearch") : "" }
-        );
-      } else {
-        this.getlistData(
-          { pageNo: this.page.pageNo, pageSize: this.page.pageSize },
-          {
-            type: 9,
-            carNumber: this.page.carNumber,
-            orgName: flag ? localStorage.getItem("orgSearch") : ""
-          }
-        );
-      }
-
-    },
-    computed : {
-      // ...mapState(['searchData','searchForm',
-      //   'editCfg','editData',
-      //   'redordCols',
-      //   // 'tableData','newBtnList','checkButtonList','reviewButtonList','remarkButtonList'
-      // ]), //读数据
-
-      // this.aaa = searchForm
-    },
-  }
-
-
-</script>
-
-<style>
-
-</style>-->
-
-
-<!--待检测工单-->
-<!--
 
 <template>
     <div class="ces-main">
+        <!--<span>{{tableCols}}</span>-->
         <search-form
                 size='medium '
                 labelWidth = '80px'
@@ -1180,205 +1167,6 @@
       );
     },
     computed : {
-    },
-  }
-
-
-</script>
-
-<style>
-
-</style>
--->
-
-<!--待上传照片-->
-
-<template>
-    <div class="ces-main">
-        <search-form
-                size='medium '
-                labelWidth = '80px'
-                :searchData = "searchData"
-                :searchForm = "searchForm"
-                :searchHandle="searchHandle">
-        </search-form>
-        <ces-table
-                :that='that'
-                size='small '
-                :isSelection='true'
-                :isIndex='true'
-                :isHandle='true'
-                :tableData='tableData'
-                :tableCols='tableCols'
-                :newBtnList="newBtnList"
-                :isPagination='true'
-                :tablePage='pagination'
-                :longDatas="longDatas"
-        >
-        </ces-table>
-
-    </div>
-</template>
-
-<script>
-  import net from "../../assets/js/public";
-  import SearchForm from './searchForm'
-  import cesTable from './compomentTable'
-  import moment from 'moment'
-  export default {
-    data () {
-      return {
-        that : this,
-        // 查询表单
-        searchData:{
-          carNumber:null,
-        },
-        searchForm:[//搜索栏
-          {type:'Input',prop:'carNumber',width:'180px',placeholder:'请输入车牌'},
-        ],
-        searchHandle:[//搜索按钮
-          {label:'查询',icon:"el-icon-search",type:'primary',handle:()=>this.searchNews()},
-        ],
-        tableData : [],// 表格数据
-        tableCols:[// 表头
-          {label:'车牌',prop:'carNumber'},
-          {label:'车辆信息',type:'longData'},
-          {label:'下单时间',prop:'inputTime'},
-          {label:'业务类型',prop:'checkType'},
-          {label:'故障描述',prop:'note'},
-          {label:'发动机缸数量',prop:'carCylinder'},
-          {label:'当前操作人',prop:'operatorName'},
-          {label:'操作',type:'button',},
-          {label:'冻结',type:'Button',btnList:[
-              {type:'danger',label:'冻结工单',handle:(row,that)=>this.showRecord(row,that)},
-            ]},
-         ],
-        newBtnList:[],
-
-      /*
-
-
-          {id:1,carNumber:'粤B555'},
-          {id:2,carNumber:'粤B555'},
-          {id:3,carNumber:'粤B555'},
-
-      {id : 1,btnList:[
-        {type:'primary',label:'上传照片',isShow:true, handle:(row,that)=>this.showEditTest(row,that)},
-        {type:'success',label:'完成',isShow:false, handle:row=>''}
-      ]
-      },
-      {id : 2,btnList:[
-        {type:'primary',label:'上传照片',isShow:true, handle:(row,that)=>this.showEditTest(row,that)},
-        {type:'success',label:'完成',isShow:false, handle:row=>''}
-      ]
-      },
-      {id : 3,btnList:[
-        {type:'primary',label:'上传照片',isShow:true, handle:(row,that)=>this.showEditTest(row,that)},
-        {type:'success',label:'完成',isShow:false, handle:row=>''}
-      ]
-      },*/
-
-      longDatas : [],
-        pagination:{//页数...
-          pageSize:10,
-          pageNum:1,
-          total:0
-        },
-        orderPageShowOrgName: false,
-      }
-    },
-    components:{
-      cesTable,
-      SearchForm,
-    },
-    methods : {
-      // 获取列表数据
-      getlistData(param, data){
-        net
-          .request("admin/order/queryListPage", "post", param, data)
-          .then(res => {
-            if (res.retcode == 1) {
-              const data = res.data.rows
-              const carMsgArr = []
-              const imgBtnArr = []
-                for(let i = 0; i < data.length; i++){
-                  data[i].inputTime = moment(data[i].inputTime).format('YYYY-MM-DD HH:MM')// 转换下单时间格式
-                  data[i].id = i+1// 添加一个id
-                  carMsgArr.push({//封装车辆信息格式
-                    id : i+1,
-                    note:[
-                      data[i].factoryName,
-                      data[i].seriesName,
-                      data[i].modelName,
-                    ]
-                  })
-                  if(data[i].jobCode == 20){
-                    imgBtnArr.push(
-                      {type:'primary',label:'上传照片',isShow:true, handle:(row,that)=>this.showEditTest(row,that)},
-                      {type:'success',label:'完成',isShow:false,}
-                    )
-                  }
-                if(data[i].jobCode == 30 || data[i].jobCode == 31 || data[i].jobCode == 32){
-                    imgBtnArr.push(
-                      {type:'primary',label:'上传照片',isShow:true, handle:(row,that)=>this.showEditTest(row,that)},
-                      {type:'success',label:'完成',isShow:true, handle:(row,that)=>this.showEditTest(row,that)}
-                    )
-                  }
-
-                }
-
-              let minArr = []
-              let imgBtnArrList = []
-              console.log(imgBtnArr)
-              imgBtnArr.forEach((c,index) => {
-                if (minArr.length === 2) {//如果小数组已经满了，创建一个新的  （两个为一组）
-                  minArr = []
-                }
-                if(minArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
-                  imgBtnArrList.push({
-                    id : index/2  +1,
-                    btnList : minArr
-                  })
-                }
-                minArr.push(c)//将当前分类保存到小数组中
-              })
-
-              console.log(data)
-              console.log(carMsgArr)
-              console.log(imgBtnArrList)
-
-            this.tableData = data;
-            this.longDatas = carMsgArr
-            this.newBtnList = imgBtnArrList
-            } else {
-              net.message(this, "获取数据失败", "warning");
-            }
-          });
-      },
-      // 点击上传照片按钮
-      showEditTest(row,that){
-        console.log(row,that)
-        this.$confirm("此操作将冻结此工单, 是否继续?", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-            net.message(this, "操作成功", "success");
-          for (let i=0;i<4;i++) {
-            if(that.id === i){
-              this.newBtnList[i-1].btnList[1].isShow = true
-            }
-          }
-        });
-      },
-    },
-    created() {
-      var signInfo = JSON.parse(sessionStorage.getItem("signInfo"));
-      this.orderPageShowOrgName = signInfo.orgId == 0;
-      this.getlistData(
-        { pageNo: this.pagination.pageNum, pageSize: this.pagination.pageSize },
-        { type: 2 }
-      );
     },
   }
 

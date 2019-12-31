@@ -6,10 +6,7 @@
                 <!-- 输入框 -->
                 <el-input v-if="item.type==='Input'" v-model="searchData[item.prop]" size="mini" :placeholder="item.placeholder" clearable class="input40" ></el-input>
                 <!-- 下拉框 -->
-                <!--<el-select v-if="item.type==='Select'" v-model="searchData[item.prop]" size="mini" @change="item.change(searchData[item.prop])" :placeholder="item.placeholder" clearable>
-                    <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value"></el-option>
-                </el-select>-->
-                <el-select v-if="item.type==='Select'" v-model="searchData[item.prop]" size="mini" :placeholder="item.placeholder" clearable>
+                <el-select v-if="item.type==='Select'" v-model="searchData[item.prop]" size="mini" @change="item.change(searchData[item.prop])" :placeholder="item.placeholder" clearable>
                     <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value"></el-option>
                 </el-select>
                 <!-- 单选 -->

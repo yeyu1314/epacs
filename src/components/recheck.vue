@@ -463,7 +463,6 @@ export default {
         .request("admin/order/queryListPage", "post", param, data)
         .then(res => {
           if (res.retcode == 1) {
-            console.log(res)
             this.listData = res.data.rows;
             this.total = res.data.total;
           } else {

@@ -39,7 +39,6 @@ export default {
   ],
 
 
-  // demo
   that : this,
   tableColsDemo: [
     {label:'车牌',prop:'carNumber'},
@@ -57,7 +56,7 @@ export default {
   ],
   tableDataDemo : [],
   newBtnListDemo : [],
-  paginationDemo : {pageSize:10,pageNum:1,total:10},
+  paginationDemo : {pageSize:10,pageNum:1,total:500},
   longDatasDemo : [],
   checkButtonListDemo : [],
   reviewButtonListDemo : [],

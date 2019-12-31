@@ -120,6 +120,11 @@ export default new Router({
         name: 'orderInport',
         component: () => import('./views/form/testTable.vue'),
       },
+      {                                                               //测试表格
+        path: "/demoTable",
+        name: 'demoTable',
+        component: () => import('./views/form/demoTable.vue'),
+      },
     { //工单录入
       path: "/orderInport",
       name: 'orderInport',

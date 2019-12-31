@@ -3,7 +3,7 @@
 */
 import {UPDATE_LIST} from './mutation_types'
 import net from "../../assets/js/public";
-import {getlistData,getOpaction,getRemarkData} from '../../api/index'
+import {getlistData,getOpaction} from '../../api/index'
 
 export default {
   //异步获取地址
@@ -18,19 +18,13 @@ export default {
         checkType: '',
       }
     )
-    console.log(state)
+    console.log(result)
     if(result.retcode === 1){//判断结果是否正确
       const listData = result.data
       const  showCheckReport = function(jobId){
         console.log("显示初检报告==》"+jobId)
       }
-      const  showRemarkDemo = function(row,that){
-        console.log("备注11==》"+row)
-        console.log("备注22==》"+that)
-      }
-
-
-      commit(UPDATE_LIST, {listData,showCheckReport,showRemarkDemo})//提交一个mutation
+      commit(UPDATE_LIST, {listData,showCheckReport})//提交一个mutation
 
     }
   },

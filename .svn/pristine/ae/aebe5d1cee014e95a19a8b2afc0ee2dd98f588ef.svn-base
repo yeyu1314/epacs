@@ -664,7 +664,7 @@
                  :data='tableData'
                  :size='size'
                   height="100%"
-                 style="width: 100%;height: 100%"
+                 style="width: 100%"
                  :border  ='isBorder'
                  @select='select'
                 @select-all='selectAll'
@@ -928,10 +928,9 @@
     .has-gutter tr th {
         text-align: center;
     }
-    .el-table__body-wrapper {
-        height: 100% !important;
+    . el-table__body-wrapper {
+        height: 500px !important;
     }
-
 </style>
 
 

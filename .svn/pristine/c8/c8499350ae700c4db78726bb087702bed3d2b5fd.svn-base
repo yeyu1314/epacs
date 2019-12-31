@@ -804,28 +804,28 @@ export default {
                     checkArr.push(c)//将当前分类保存到小数组中
                   })
                   reviewButtonArr.forEach((c,index) => {
-                    if (reviewArr.length === 1) {
+                    if (reviewArr.length === 1) {//如果小数组已经满了，创建一个新的  （两个为一组）
                       reviewArr = []
                     }
-                    if(reviewArr.length === 0) {
+                    if(reviewArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
                       reviewButtonList.push({
                         id : index  +1,
                         btnList : reviewArr
                       })
                     }
-                    reviewArr.push(c)
+                    reviewArr.push(c)//将当前分类保存到小数组中
                   })
                   remarkButtonArr.forEach((c,index) => {
-                    if (remarkArr.length === 1) {
+                    if (remarkArr.length === 1) {//如果小数组已经满了，创建一个新的  （两个为一组）
                       remarkArr = []
                     }
-                    if(remarkArr.length === 0) {
+                    if(remarkArr.length === 0) {//如果minArr是空的，将小数组保存到大数组中
                       remarkButtonList.push({
                         id : index  +1,
                         btnList : remarkArr
                       })
                     }
-                    remarkArr.push(c)
+                    remarkArr.push(c)//将当前分类保存到小数组中
                   })
                   this.checkButtonList = checkButtonList
                   this.reviewButtonList = reviewButtonList

@@ -664,7 +664,7 @@
                  :data='tableData'
                  :size='size'
                   height="100%"
-                 style="width: 100%;height: 100%"
+                 style="width: 100%"
                  :border  ='isBorder'
                  @select='select'
                 @select-all='selectAll'
@@ -695,7 +695,7 @@
                             </div>
                         </div>
 
-                        <!-- 按钮--><!--一个单元格多个按钮         显示 / 隐藏           -->
+                        <!-- 按钮-->
                         <div v-for="btnItem in newBtnList" :key="btnItem.id">
                             <template v-if="item.type==='button' && btnItem.id === scope.row.id" >
                                 <el-button v-for="btn in btnItem.btnList" :key="btn.label"
@@ -709,7 +709,7 @@
                                 </el-button>
                             </template>
                         </div>
-                        <!--一个单元格一个按钮         显示      -->
+
                         <template v-if="item.type === 'Button'">
                             <el-button v-for="btnItem in item.btnList" :key="btnItem.label"
                                     :disabled="btnItem.disabled && btnItem.disabled(scope.row)"
@@ -720,7 +720,6 @@
                             </el-button>
                         </template>
 
-                        <!--@click="btn.handle(scope.row,btn.jobID)"-->
                         <template v-if="item.type === 'checkButton'">
                              <div v-for="btnItem in checkButtonList" :key="btnItem.id">
                                 <template v-if="btnItem.id === scope.row.id" >
@@ -761,7 +760,7 @@
                                                :type="btn.type"
                                                :size="size || btn.size"
                                                :icon="btn.icon"
-                                               @click="btn.handle(btn.allData,btn.jobID)"
+                                               @click="btn.handle(that,scope.row)"
                                                v-show="btn.isShow"
                                     >{{btn.label}}
                                     </el-button>
@@ -928,10 +927,9 @@
     .has-gutter tr th {
         text-align: center;
     }
-    .el-table__body-wrapper {
-        height: 100% !important;
+    . el-table__body-wrapper {
+        height: 500px !important;
     }
-
 </style>
 
 

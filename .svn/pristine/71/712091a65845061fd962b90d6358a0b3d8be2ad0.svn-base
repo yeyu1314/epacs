@@ -4,12 +4,13 @@
 import {UPDATE_LIST} from './mutation_types'
 import moment from "moment"
 export default {
-  [UPDATE_LIST](state,{listData,showCheckReport,showRemarkDemo}){
+  [UPDATE_LIST](state,{listData,showCheckReport}){
     state.paginationDemo = {
       pageNum:listData.pageNo,
       pageSize:listData.pageSize,
       total:listData.total
     };
+    console.log(listData)
     const data = listData.rows
     const tableArr = []
     const carMsgArr = []
@@ -45,13 +46,18 @@ export default {
     const reviewButtonList = []
     const remarkButtonArr = []
     const remarkButtonList = []
-    console.log(tableArr)
     for (let i = 0; i < tableArr.length; i++) {
       if(tableArr[i].checkTypeId === 1 || tableArr[i].checkTypeId === 3) {// 控制显示隐藏的条件    1---检测 2----治疗  3 ----检测+治疗
-        checkButtonArr.push({id:i,jobID:tableArr[i].jobId,type:'primary',label:'查看检测报告',isShow: true,size:'small ',
-          handle:(row,jobid)=>{
-            console.log("点击了" + jobid,row)
-            showCheckReport(jobid,row)
+        checkButtonArr.push({
+          id:i,
+          jobID:tableArr[i].jobId,
+          type:'primary',
+          label:'查看检测报告',
+          isShow: true,
+          size:'small ',
+          handle:(that,jobid)=>{
+            console.log("点击了" + jobid)
+            showCheckReport(jobid)
           }
         })
       }else {
@@ -63,12 +69,7 @@ export default {
         reviewButtonArr.push({id:i,type:'warning',label:'查看复查报告',isShow: false,} )
       }
       if(tableArr[i].jobCode === 1000 || tableArr[i].jobCode === 1010){
-        remarkButtonArr.push({id:i,jobID:tableArr[i].jobId,allData:tableArr[i],type:'success',label:'备注项',isShow: true,
-          handle:(row,that)=>{
-          console.log(row)
-            showRemarkDemo(row,that)
-          }
-        })
+        remarkButtonArr.push({id:i,type:'success',label:'备注项',isShow: true, handle:(row,that)=>this.showRemark(row,that)})
       }else {
         remarkButtonArr.push({id:i,type:'success',label:'备注项',isShow: false,} )
       }

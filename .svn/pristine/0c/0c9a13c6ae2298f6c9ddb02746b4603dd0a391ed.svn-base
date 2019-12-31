@@ -928,10 +928,9 @@
     .has-gutter tr th {
         text-align: center;
     }
-    .el-table__body-wrapper {
-        height: 100% !important;
+    . el-table__body-wrapper {
+        height: 500px !important;
     }
-
 </style>
 
 

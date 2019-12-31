@@ -811,7 +811,6 @@
             <el-select
               v-model="value3"
               clearable
-              filterable
               placeholder="请选择车系"
               @change="audiChange"
               class="p_select"
@@ -1003,6 +1002,16 @@ import $ from "jquery";
 export default {
   data() {
     return {
+      radio1 : '',
+      radio1Item : ["进气道露出金属光泽；","进气道部分区域露出金属光泽；","进气道没有金属光泽露出；"],
+      radio2 : '',
+      radio2Item : ["进气阀阀杆和阀座露出金属色泽；","进气阀阀杆露出金属色泽，阀座无金属色泽露出；","进气阀阀杆和阀座无金属色泽露出；"],
+      radio3 : '',
+      radio3Item : ["喷油嘴及喷孔可见；","喷油嘴喷孔部分可见；","喷油嘴喷孔不可见；"],
+      radio4 : '',
+      radio4Item : ["活塞顶大部分区域露出金属色泽；","活塞顶部分区域有金属色泽露出；","活塞顶没有金属色泽露出；"],
+      radio5 : '',
+      radio5Item : ["缸壁未见异常划痕。","缸壁有轻微划痕。","缸壁有深度划痕。"],
       orderPageShowOrgName: false,
       editMileNumber: "",
       dialogVisible4: false,
@@ -1117,16 +1126,6 @@ export default {
               {id:3,laber:'中度以上',value:3}
         ],
       dimensionalityValue : '',
-      radio1 : '',
-      radio1Item : ["进气道露出金属光泽；","进气道部分区域露出金属光泽；","进气道没有金属光泽露出；"],
-      radio2 : '',
-      radio2Item : ["进气阀阀杆和阀座露出金属色泽；","进气阀阀杆露出金属色泽，阀座无金属色泽露出；","进气阀阀杆和阀座无金属色泽露出；"],
-      radio3 : '',
-      radio3Item : ["喷油嘴及喷孔可见；","喷油嘴喷孔部分可见；","喷油嘴喷孔不可见；"],
-      radio4 : '',
-      radio4Item : ["活塞顶大部分区域露出金属色泽；","活塞顶部分区域有金属色泽露出；","活塞顶没有金属色泽露出；"],
-      radio5 : '',
-      radio5Item : ["缸壁未见异常划痕。","缸壁有轻微划痕。","缸壁有深度划痕。"],
     };
   },
   created() {
