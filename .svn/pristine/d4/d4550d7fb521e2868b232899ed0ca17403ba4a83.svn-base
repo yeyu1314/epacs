@@ -879,6 +879,16 @@ export default {
                   checkType: checkType
                 }
         );
+        // this.getlistData(
+        //         { pageNo: this.pageNo, pageSize: this.pageSize },
+        //         {
+        //           type: 9,
+        //           carNumber: this.carPai,
+        //           orgName: this.orgSearch,
+        //           seriesName: this.carSeSearch,
+        //           checkType: this.checkType
+        //         }
+        // );
       }
 
     },

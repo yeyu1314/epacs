@@ -36,7 +36,7 @@
                 <el-switch v-if="item.type==='Switch'" v-model="searchData[item.prop]" ></el-switch>
             </el-form-item>
             <el-form-item v-for='item in searchHandle' :key="item.label" style="float: left">
-                <el-button :type="item.type" :size="item.size || size" @click='item.handle()' :icon="item.icon" style="background: #009688;margin-left:15px;height:36px;" >{{item.label}}</el-button>
+                <el-button :type="item.type" :size="item.size || size" @click='item.handle()' :icon="item.icon" style="background: #009688;margin-left:15px;height: 40px;" >{{item.label}}</el-button>
             </el-form-item>
         </el-form>
         <!--<el-form inline v-if='isHandle'>

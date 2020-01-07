@@ -408,7 +408,7 @@
                           />
                           <p
                             style="font-size: 14px;text-align: center;margin-top: -3px;
-                              background:#ff0000; 
+                              background:#ff0000;
                               color: #fff;
                               height: 20px;
                               line-height: 22px;
@@ -434,7 +434,7 @@
                           <div style="width: 118px;height: 88px;border: 1px solid #eee;"></div>
                           <p
                             style="font-size: 14px;text-align: center;
-                              background: #ff0000; 
+                              background: #ff0000;
                               color: #fff;
                               font-size: 14px;
                               height: 20px;
@@ -494,7 +494,7 @@
                           <div style="width: 118px;height: 88px;border: 1px solid #eee;"></div>
                           <p
                             style="font-size: 14px;text-align: center;
-                              background: #ff0000; 
+                              background: #ff0000;
                               color: #fff;
                               font-size: 14px;
                               height: 20px;
@@ -567,7 +567,7 @@
                     v-show="!isprint"
                     style="word-wrap:break-word;    text-align: left;    padding-left: 10px;font-size:13px;margin:0;padding: 5px;"
                   >
-                    
+
                   </p>-->
                   <p
                     v-show="!isprint"
@@ -945,6 +945,7 @@ export default {
   },
   created() {
     var args = JSON.parse(sessionStorage.getItem("signInfo"));
+    console.log(args)
     if (args.isPrinting == 0) {
       this.ctroPrinting = false;
     }

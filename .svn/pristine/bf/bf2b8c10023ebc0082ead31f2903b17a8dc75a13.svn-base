@@ -874,8 +874,8 @@ export default {
                 {
                   type: 9,
                   carNumber: carNumber,
-                  orgName: station,// 维修站
-                  seriesName: carMsg,// 车系
+                  orgName: carMsg,
+                  seriesName: station,
                   checkType: checkType
                 }
         );

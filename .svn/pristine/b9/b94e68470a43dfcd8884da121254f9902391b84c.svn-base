@@ -752,7 +752,7 @@
                                 </template>
                             </div>
                         </template>
-                        <!-- @click="btn.handle(btn.allData,btn.jobID)"-->
+
                         <template v-if="item.type === 'remarkButton'">
                              <div v-for="btnItem in remarkButtonList" :key="btnItem.id">
                                 <template v-if="btnItem.id === scope.row.id" >
@@ -761,7 +761,7 @@
                                                :type="btn.type"
                                                :size="size || btn.size"
                                                :icon="btn.icon"
-                                               @click="btn.handle(that,scope.row)"
+                                               @click="btn.handle(btn.allData,btn.jobID)"
                                                v-show="btn.isShow"
                                     >{{btn.label}}
                                     </el-button>
